@@ -11,8 +11,8 @@ public class Main {
                 System.out.println("1. Add student");
                 System.out.println("2. Update student");
                 System.out.println("3. Delete student");
-                System.out.println("4. Display all students");
-                System.out.println("5. Search student by ID");
+                System.out.println("4. Display students");
+                System.out.println("5. Search student");
                 System.out.println("6. Exit");
 
                 int choice = scanner.nextInt();
@@ -52,6 +52,34 @@ public class Main {
                         dbManager.deleteStudent(deleteId);
                         break;
                     case 4:
+                        System.out.println("Choose a sorting method:");
+                        System.out.println("1. ID");
+                        System.out.println("2. First Name");
+                        System.out.println("3. Last Name");
+                        System.out.println("4. Age");
+                        System.out.println("5. Grade");
+                        int sortChoice = scanner.nextInt();
+                        scanner.nextLine();
+                        switch (sortChoice) {
+                            case 1:
+                                dbManager.setSortMethod("id");
+                                break;
+                            case 2:
+                                dbManager.setSortMethod("first_name");
+                                break;
+                            case 3:
+                                dbManager.setSortMethod("last_name");
+                                break;
+                            case 4:
+                                dbManager.setSortMethod("age");
+                                break;
+                            case 5:
+                                dbManager.setSortMethod("grade");
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Sorting by ID.");
+                                dbManager.setSortMethod("id");
+                        }
                         dbManager.printStudents();
                         break;
                     case 5:

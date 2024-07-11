@@ -5,7 +5,9 @@ public class Db {
     private static final String USER = "root";
     private static final String PASSWORD = "patesaup0ulet";
 
-    private Connection connection;
+    private final Connection connection;
+
+    private static String sortMethod = "id";
 
     public Db() throws SQLException {
         try {
@@ -59,18 +61,18 @@ public class Db {
     }
 
     public void printStudents() throws SQLException {
-        String query = "SELECT * FROM student";
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()) {
-                System.out.println(resultSet.getInt("id") + " " +
-                        resultSet.getString("first_name") + " " +
-                        resultSet.getString("last_name") + " " +
-                        resultSet.getInt("age") + " " +
-                        resultSet.getDouble("grade"));
+        String query = "SELECT * FROM student ORDER BY " + sortMethod;
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            System.out.println("Students sorted by : " + sortMethod);
+            while (rs.next()) {
+                System.out.printf("ID: %d, First Name: %s, Last Name: %s, Age: %d, Grade: %s%n",
+                        rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getInt("age"), rs.getString("grade"));
             }
         }
     }
+
     public void searchStudentById(int id) throws SQLException {
         String query = "SELECT * FROM student WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -85,6 +87,10 @@ public class Db {
                 }
             }
         }
+    }
+
+    public void setSortMethod(String sortMethod) {
+        this.sortMethod = sortMethod;
     }
 
 }
