@@ -83,9 +83,51 @@ public class Main {
                         dbManager.printStudents();
                         break;
                     case 5:
-                        System.out.print("Enter student ID to search: ");
-                        int searchId = scanner.nextInt();
-                        dbManager.searchStudentById(searchId);
+                        System.out.println("Choose a searching method:");
+                        System.out.println("1. ID");
+                        System.out.println("2. First Name");
+                        System.out.println("3. Last Name");
+                        System.out.println("4. Age");
+                        System.out.println("5. Grade");
+                        int searchChoice = scanner.nextInt();
+
+                        switch (searchChoice) {
+                            case 1:
+                                dbManager.setSearchMethod("id");
+                                System.out.print("Enter student ID to search: ");
+                                int searchId = scanner.nextInt();
+                                scanner.nextLine();
+                                dbManager.searchStudent(String.valueOf(searchId));
+                                break;
+                            case 2:
+                                dbManager.setSearchMethod("first_name");
+                                System.out.print("Enter student first name to search: ");
+                                String searchFirstName = scanner.next();
+                                dbManager.searchStudent(searchFirstName);
+                                break;
+                            case 3:
+                                dbManager.setSearchMethod("last_name");
+                                System.out.print("Enter student last name to search: ");
+                                String searchLastName = scanner.next();
+                                dbManager.searchStudent(searchLastName);
+                                break;
+                            case 4:
+                                dbManager.setSearchMethod("age");
+                                System.out.print("Enter student age to search: ");
+                                int searchAge = scanner.nextInt();
+                                scanner.nextLine();
+                                dbManager.searchStudent(String.valueOf(searchAge));
+                                break;
+                            case 5:
+                                dbManager.setSearchMethod("grade");
+                                System.out.print("Enter student grade to search: ");
+                                int searchGrade = scanner.nextInt();
+                                scanner.nextLine();
+                                dbManager.searchStudent(String.valueOf(searchGrade));
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Please try again.");
+                        }
                         break;
                     case 6:
                         dbManager.close();
