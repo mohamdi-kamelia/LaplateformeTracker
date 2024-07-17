@@ -15,39 +15,41 @@ public class Main {
                 System.out.println("6. Trier les étudiants");
                 System.out.println("7. Recherche avancée par moyenne de notes");
                 System.out.println("8. Statistiques");
-                System.out.println("9. Quitter");
+                System.out.println("9. Exporter vers un fichier CSV");
+                System.out.println("10. Importer depuis un fichier CSV");
+                System.out.println("11. Quitter");
                 int choice = scanner.nextInt();
-                scanner.nextLine();
+                scanner.nextLine(); // Consume newline
                 switch (choice) {
                     case 1:
-                        System.out.print("Entrez le prénom : ");
+                        System.out.print("Prénom : ");
                         String firstName = scanner.nextLine();
-                        System.out.print("Entrez le nom de famille : ");
+                        System.out.print("Nom : ");
                         String lastName = scanner.nextLine();
-                        System.out.print("Entrez l'âge : ");
+                        System.out.print("Âge : ");
                         int age = scanner.nextInt();
-                        scanner.nextLine(); // Consommer la nouvelle ligne
-                        System.out.print("Entrez la note : ");
+                        scanner.nextLine(); // Consume newline
+                        System.out.print("Grade : ");
                         String grade = scanner.nextLine();
                         dbManager.addStudent(firstName, lastName, age, grade);
                         break;
                     case 2:
-                        System.out.print("Entrez l'identifiant de l'étudiant à mettre à jour : ");
+                        System.out.print("ID de l'étudiant à mettre à jour : ");
                         int updateId = scanner.nextInt();
-                        scanner.nextLine(); // Consommer la nouvelle ligne
-                        System.out.print("Entrez le prénom : ");
-                        firstName = scanner.nextLine();
-                        System.out.print("Entrez le nom de famille : ");
-                        lastName = scanner.nextLine();
-                        System.out.print("Entrez l'âge : ");
-                        age = scanner.nextInt();
-                        scanner.nextLine(); // Consommer la nouvelle ligne
-                        System.out.print("Entrez la note : ");
-                        grade = scanner.nextLine();
-                        dbManager.updateStudent(updateId, firstName, lastName, age, grade);
+                        scanner.nextLine(); // Consume newline
+                        System.out.print("Nouveau prénom : ");
+                        String newFirstName = scanner.nextLine();
+                        System.out.print("Nouveau nom : ");
+                        String newLastName = scanner.nextLine();
+                        System.out.print("Nouvel âge : ");
+                        int newAge = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+                        System.out.print("Nouveau grade : ");
+                        String newGrade = scanner.nextLine();
+                        dbManager.updateStudent(updateId, newFirstName, newLastName, newAge, newGrade);
                         break;
                     case 3:
-                        System.out.print("Entrez l'identifiant de l'étudiant à supprimer : ");
+                        System.out.print("ID de l'étudiant à supprimer : ");
                         int deleteId = scanner.nextInt();
                         dbManager.deleteStudent(deleteId);
                         break;
@@ -55,64 +57,79 @@ public class Main {
                         dbManager.printStudents();
                         break;
                     case 5:
-                        System.out.print("Entrez l'identifiant de l'étudiant à rechercher : ");
+                        System.out.print("Entrez l'ID de l'étudiant à rechercher : ");
                         int searchId = scanner.nextInt();
                         dbManager.searchStudentById(searchId);
                         break;
                     case 6:
-                        System.out.println("Choisissez une méthode de tri :");
-                        System.out.println("1. Prénom");
-                        System.out.println("2. Nom de famille");
-                        System.out.println("3. Âge");
-                        System.out.println("4. Note");
+                        System.out.println("Trier par :");
+                        System.out.println("1. ID");
+                        System.out.println("2. Prénom");
+                        System.out.println("3. Nom");
+                        System.out.println("4. Âge");
+                        System.out.println("5. Grade");
                         int sortChoice = scanner.nextInt();
-                        scanner.nextLine(); // Consommer la nouvelle ligne
+                        scanner.nextLine(); // Consume newline
                         switch (sortChoice) {
                             case 1:
-                                dbManager.setSortMethod("first_name");
+                                dbManager.setSortMethod("id");
                                 break;
                             case 2:
-                                dbManager.setSortMethod("last_name");
+                                dbManager.setSortMethod("first_name");
                                 break;
                             case 3:
-                                dbManager.setSortMethod("age");
+                                dbManager.setSortMethod("last_name");
                                 break;
                             case 4:
+                                dbManager.setSortMethod("age");
+                                break;
+                            case 5:
                                 dbManager.setSortMethod("grade");
                                 break;
                             default:
-                                System.out.println("Choix invalide. Tri par identifiant.");
+                                System.out.println("Choix invalide. Tri par défaut par ID.");
                                 dbManager.setSortMethod("id");
                         }
-                        dbManager.printStudents();
                         break;
                     case 7:
-                        System.out.println("Choisissez un intervalle pour la moyenne de notes :");
-                        System.out.println("1. De 0 à 20");
-                        System.out.println("2. De 20 à 40");
-                        System.out.println("3. De 40 à 60");
-                        System.out.println("4. De 60 à 80");
-                        System.out.println("5. De 80 à 100");
-                        int intervalChoice = scanner.nextInt();
-                        scanner.nextLine(); // Consommer la nouvelle ligne
-                        dbManager.advancedSearchByMoyeneeDeNotes(intervalChoice);
+                        System.out.println("Recherche avancée par moyenne de notes :");
+                        System.out.println("1. 0-20");
+                        System.out.println("2. 20-40");
+                        System.out.println("3. 40-60");
+                        System.out.println("4. 60-80");
+                        System.out.println("5. 80-100");
+                        int interval = scanner.nextInt();
+                        dbManager.advancedSearchByMoyeneeDeNotes(interval);
                         break;
                     case 8:
-                        System.out.println("Choisissez les statistiques :");
-                        System.out.println("1. Par moyenne de notes");
-                        System.out.println("2. Par tranche d'âge");
+                        System.out.println("Statistiques par :");
+                        System.out.println("1. Grade");
+                        System.out.println("2. Âge");
                         int statChoice = scanner.nextInt();
-                        scanner.nextLine(); // Consommer la nouvelle ligne
-                        if (statChoice == 1) {
-                            dbManager.calculateStatisticsByGrade();
-                        } else if (statChoice == 2) {
-                            dbManager.calculateStatisticsByAge();
-                        } else {
-                            System.out.println("Choix invalide.");
+                        scanner.nextLine(); // Consume newline
+                        switch (statChoice) {
+                            case 1:
+                                dbManager.calculateStatisticsByGrade();
+                                break;
+                            case 2:
+                                dbManager.calculateStatisticsByAge();
+                                break;
+                            default:
+                                System.out.println("Choix invalide. Statistiques par défaut par Grade.");
+                                dbManager.calculateStatisticsByGrade();
                         }
                         break;
-
                     case 9:
+                        System.out.print("Entrez le chemin complet du fichier CSV pour l'exportation : ");
+                        String exportFilePath = scanner.nextLine();
+                        dbManager.exportToCSV(exportFilePath);
+                        break;
+                    case 10:
+                        System.out.print("Entrez le chemin complet du fichier CSV pour l'importation : ");
+                        String importFilePath = scanner.nextLine();
+                        dbManager.importFromCSV(importFilePath);
+                        break;
+                    case 11:
                         dbManager.close();
                         System.out.println("Sortie...");
                         return;
@@ -125,3 +142,4 @@ public class Main {
         }
     }
 }
+

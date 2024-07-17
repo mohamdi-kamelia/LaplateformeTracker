@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 
 public class Db {
@@ -29,7 +33,7 @@ public class Db {
     }
 
     public void addStudent(String firstName, String lastName, int age, String grade) throws SQLException {
-        String query = "INSERT INTO student (first_name, last_name, age, grade, MoyeneeDeNotes) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO student (first_name, last_name, age, grade) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, firstName);
             statement.setString(2, lastName);
@@ -155,11 +159,11 @@ public class Db {
 
     public void calculateStatisticsByGrade() throws SQLException {
         String query = "SELECT " +
-                "SUM(CASE WHEN MoyeneeDeNotes BETWEEN 0 AND 20 THEN 1 ELSE 0 END) AS range_0_20, " +
-                "SUM(CASE WHEN MoyeneeDeNotes BETWEEN 20 AND 40 THEN 1 ELSE 0 END) AS range_20_40, " +
-                "SUM(CASE WHEN MoyeneeDeNotes BETWEEN 40 AND 60 THEN 1 ELSE 0 END) AS range_40_60, " +
-                "SUM(CASE WHEN MoyeneeDeNotes BETWEEN 60 AND 80 THEN 1 ELSE 0 END) AS range_60_80, " +
-                "SUM(CASE WHEN MoyeneeDeNotes BETWEEN 80 AND 100 THEN 1 ELSE 0 END) AS range_80_100 " +
+                "SUM(CASE WHEN average_grade BETWEEN 0 AND 20 THEN 1 ELSE 0 END) AS range_0_20, " +
+                "SUM(CASE WHEN average_grade BETWEEN 20 AND 40 THEN 1 ELSE 0 END) AS range_20_40, " +
+                "SUM(CASE WHEN average_grade BETWEEN 40 AND 60 THEN 1 ELSE 0 END) AS range_40_60, " +
+                "SUM(CASE WHEN average_grade BETWEEN 60 AND 80 THEN 1 ELSE 0 END) AS range_60_80, " +
+                "SUM(CASE WHEN average_grade BETWEEN 80 AND 100 THEN 1 ELSE 0 END) AS range_80_100 " +
                 "FROM student";
 
         try (Statement stmt = connection.createStatement();
@@ -199,4 +203,48 @@ public class Db {
         }
     }
 
+    public void exportToCSV(String filePath) throws SQLException {
+        String query = "SELECT * FROM student";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query);
+             FileWriter writer = new FileWriter(filePath)) {
+
+            writer.append("ID,First Name,Last Name,Age,Grade,Average Grade\n");
+
+            while (rs.next()) {
+                writer.append(String.format("%d,%s,%s,%d,%s,%.2f\n",
+                        rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getInt("age"), rs.getString("grade"), rs.getDouble("average_grade")));
+            }
+
+            System.out.println("Exportation des données vers " + filePath + " réussie.");
+        } catch (IOException e) {
+            System.out.println("Erreur lors de l'écriture dans le fichier CSV.");
+            e.printStackTrace();
+        }
+    }
+
+    public void importFromCSV(String filePath) {
+        String query = "INSERT INTO student (first_name, last_name, age, grade) VALUES (?, ?, ?, ?)";
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            String line;
+            reader.readLine(); // Skip header line
+
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                statement.setString(1, data[1]); // first_name
+                statement.setString(2, data[2]); // last_name
+                statement.setInt(3, Integer.parseInt(data[3])); // age
+                statement.setString(4, data[4]); // grade
+                statement.executeUpdate();
+            }
+
+            System.out.println("Importation des données depuis " + filePath + " réussie.");
+        } catch (IOException | SQLException e) {
+            System.out.println("Erreur lors de l'importation depuis le fichier CSV.");
+            e.printStackTrace();
+        }
+    }
 }

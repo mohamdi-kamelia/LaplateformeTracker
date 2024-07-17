@@ -4,6 +4,9 @@
       <root url="jar://$PROJECT_DIR$/lib/json_simple.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$USER_HOME$/Downloads/json_simple-1.1-all/src" />
+      <root url="file://$USER_HOME$/Downloads/json_simple-1.1-all/test" />
+    </SOURCES>
   </library>
 </component>
