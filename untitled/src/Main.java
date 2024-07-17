@@ -16,10 +16,8 @@ public class Main {
                 System.out.println("7. Recherche avancée par moyenne de notes");
                 System.out.println("8. Statistiques");
                 System.out.println("9. Quitter");
-
                 int choice = scanner.nextInt();
                 scanner.nextLine();
-
                 switch (choice) {
                     case 1:
                         System.out.print("Entrez le prénom : ");
