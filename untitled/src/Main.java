@@ -18,7 +18,7 @@ public class Main {
                 System.out.println("9. Quitter");
 
                 int choice = scanner.nextInt();
-                scanner.nextLine(); // Consommer la nouvelle ligne
+                scanner.nextLine();
 
                 switch (choice) {
                     case 1:
