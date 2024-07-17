@@ -29,7 +29,7 @@ public class Db {
     }
 
     public void addStudent(String firstName, String lastName, int age, String grade) throws SQLException {
-        String query = "INSERT INTO student (first_name, last_name, age, grade) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO student (first_name, last_name, age, grade, MoyeneeDeNotes) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, firstName);
             statement.setString(2, lastName);
