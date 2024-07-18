@@ -42,9 +42,10 @@ public class Main {
                 System.out.println("6. Sort students");
                 System.out.println("7. Advanced search by average grades");
                 System.out.println("8. Statistics");
-                System.out.println("9. Export to a CSV file");
-                System.out.println("10. Import from a CSV file");
-                System.out.println("11. Exit");
+                System.out.println("9. Calculate average grade");
+                System.out.println("10. Export to a CSV file");
+                System.out.println("11. Import from a CSV file");
+                System.out.println("12. Exit");
 
                 // Read the user's choice
                 int choice = scanner.nextInt();
@@ -201,18 +202,21 @@ public class Main {
                         }
                         break;
                     case 9:
+                        dbManager.CalculateAverageGrade();
+                        break;
+                    case 10:
                         // Export student data to a CSV file
                         System.out.print("Enter the full path of the CSV file for export: ");
                         String exportFilePath = scanner.nextLine();
                         dbManager.exportToCSV(exportFilePath);
                         break;
-                    case 10:
+                    case 11:
                         // Import student data from a CSV file
                         System.out.print("Enter the full path of the CSV file for import: ");
                         String importFilePath = scanner.nextLine();
                         dbManager.importFromCSV(importFilePath);
                         break;
-                    case 11:
+                    case 12:
                         // Exit the program
                         dbManager.close();
                         System.out.println("Exiting...");

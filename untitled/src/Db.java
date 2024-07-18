@@ -246,4 +246,21 @@ public class Db {
             e.printStackTrace();
         }
     }
+
+    public void CalculateAverageGrade() {
+        String query = "SELECT grade FROM student";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            int total = 0;
+            int count = 0;
+            while (rs.next()) {
+                total += rs.getInt("grade");
+                count++;
+            }
+            System.out.println("Average grade: " + (total / count));
+        } catch (SQLException e) {
+            System.out.println("Error calculating average grade.");
+            e.printStackTrace();
+        }
+    }
 }
