@@ -5,33 +5,34 @@ import java.io.IOException;
 import java.sql.*;
 
 public class Db {
-    private static final String URL = "jdbc:mysql://localhost:3306/Ecole";
-    private static final String USER = "root";
-    private static final String PASSWORD = "Mounir-1992";
-
     private final Connection connection;
     private static String sortMethod = "id";
+    private static String searchMethod = "id";
 
-    public Db() throws SQLException {
+    // Constructor to initialize database connection
+    public Db(String databaseName, String databaseUser, String databasePassword) throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + databaseName, databaseUser, databasePassword);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new SQLException("Driver not found");
         }
     }
 
+    // Getter for the database connection
     public Connection getConnection() {
         return connection;
     }
 
+    // Method to close the database connection
     public void close() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }
 
+    // Method to add a student to the database
     public void addStudent(String firstName, String lastName, int age, String grade) throws SQLException {
         String query = "INSERT INTO student (first_name, last_name, age, grade) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -45,6 +46,7 @@ public class Db {
         }
     }
 
+    // Method to update a student's information in the database
     public void updateStudent(int id, String firstName, String lastName, int age, String grade) throws SQLException {
         String query = "UPDATE student SET first_name = ?, last_name = ?, age = ?, grade = ? WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -59,6 +61,7 @@ public class Db {
         }
     }
 
+    // Method to delete a student from the database
     public void deleteStudent(int id) throws SQLException {
         String query = "DELETE FROM student WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -67,6 +70,7 @@ public class Db {
         }
     }
 
+    // Method to print all students, sorted by a specified method
     public void printStudents() throws SQLException {
         String query;
         switch (sortMethod) {
@@ -97,10 +101,11 @@ public class Db {
         }
     }
 
-    public void searchStudentById(int id) throws SQLException {
-        String query = "SELECT * FROM student WHERE id = ?";
+    // Method to search for a student based on a specific method (e.g., ID, name)
+    public void searchStudent(String valueToSearch) throws SQLException {
+        String query = "SELECT * FROM student WHERE " + searchMethod + " = '" + valueToSearch + "'";
+        System.out.println(query);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     System.out.printf("ID: %d, First Name: %s, Last Name: %s, Age: %d, Grade: %s%n",
@@ -113,18 +118,34 @@ public class Db {
         }
     }
 
+    // Setter for the sort method
     public void setSortMethod(String sortMethod) {
         this.sortMethod = sortMethod;
     }
 
+    // Setter for the search method
+    public void setSearchMethod(String searchMethod) {
+        this.searchMethod = searchMethod;
+    }
+
+    // Method to update the average grade of students
     public void updateAverageGrade() throws SQLException {
-        String updateQuery = "UPDATE student SET average_grade = (SELECT AVG(CAST(grade AS DECIMAL(3,2))) FROM student)";
-        try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
-            updateStmt.executeUpdate();
+        String avgGradeQuery = "SELECT AVG(CAST(grade AS DECIMAL(3,2))) AS avg_grade FROM student";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(avgGradeQuery)) {
+            if (rs.next()) {
+                double avgGrade = rs.getDouble("avg_grade");
+                String updateQuery = "UPDATE student SET average_grade = ?";
+                try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+                    updateStmt.setDouble(1, avgGrade);
+                    updateStmt.executeUpdate();
+                }
+            }
         }
     }
 
-    public void advancedSearchByMoyeneeDeNotes(int interval) throws SQLException {
+    // Method to search students by average grade intervals
+    public void searchByAverageGrade(int interval) throws SQLException {
         String query;
         switch (interval) {
             case 1:
@@ -157,6 +178,7 @@ public class Db {
         }
     }
 
+    // Method to calculate statistics by grade
     public void calculateStatisticsByGrade() throws SQLException {
         String query = "SELECT " +
                 "SUM(CASE WHEN average_grade BETWEEN 0 AND 20 THEN 1 ELSE 0 END) AS range_0_20, " +
@@ -183,6 +205,7 @@ public class Db {
         }
     }
 
+    // Method to calculate statistics by age
     public void calculateStatisticsByAge() throws SQLException {
         String query = "SELECT " +
                 "SUM(CASE WHEN age BETWEEN 18 AND 20 THEN 1 ELSE 0 END) AS age_18_20, " +
@@ -203,6 +226,7 @@ public class Db {
         }
     }
 
+    // Method to export students to a CSV file
     public void exportToCSV(String filePath) throws SQLException {
         String query = "SELECT * FROM student";
         try (Statement stmt = connection.createStatement();
@@ -217,13 +241,14 @@ public class Db {
                         rs.getInt("age"), rs.getString("grade"), rs.getDouble("average_grade")));
             }
 
-            System.out.println("Exportation des données vers " + filePath + " réussie.");
+            System.out.println("Successfully exported data to " + filePath);
         } catch (IOException e) {
-            System.out.println("Erreur lors de l'écriture dans le fichier CSV.");
+            System.out.println("Error writing to the CSV file.");
             e.printStackTrace();
         }
     }
 
+    // Method to import students from a CSV file
     public void importFromCSV(String filePath) {
         String query = "INSERT INTO student (first_name, last_name, age, grade) VALUES (?, ?, ?, ?)";
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -241,9 +266,9 @@ public class Db {
                 statement.executeUpdate();
             }
 
-            System.out.println("Importation des données depuis " + filePath + " réussie.");
+            System.out.println("Successfully imported data from " + filePath);
         } catch (IOException | SQLException e) {
-            System.out.println("Erreur lors de l'importation depuis le fichier CSV.");
+            System.out.println("Error importing from the CSV file.");
             e.printStackTrace();
         }
     }
