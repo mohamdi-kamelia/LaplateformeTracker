@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../mariadb-java-client-3.4.0.jar!/" />
+          <root url="jar://$USER_HOME$/mariadb-java-client-3.4.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -26,5 +26,14 @@
     <orderEntry type="library" name="json-20210307 (2)" level="project" />
     <orderEntry type="library" name="lib  (2)" level="application" />
     <orderEntry type="library" name="json_simple" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/Mysql_Connector/mysql-connector-j-9.0.0/mysql-connector-j-9.0.0/mysql-connector-j-9.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

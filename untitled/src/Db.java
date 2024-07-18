@@ -5,17 +5,15 @@ import java.io.IOException;
 import java.sql.*;
 
 public class Db {
-    private static final String URL = "jdbc:mysql://localhost:3306/Ecole";
-    private static final String USER = "root";
-    private static final String PASSWORD = "Mounir-1992";
-
     private final Connection connection;
     private static String sortMethod = "id";
+    private static String searchMethod = "id";
 
-    public Db() throws SQLException {
+
+    public Db(String databaseName, String databaseUser, String databasePassword) throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + databaseName, databaseUser, databasePassword);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new SQLException("Driver not found");
@@ -97,10 +95,10 @@ public class Db {
         }
     }
 
-    public void searchStudentById(int id) throws SQLException {
-        String query = "SELECT * FROM student WHERE id = ?";
+    public void searchStudent(String valueToSearch) throws SQLException {
+        String query = "SELECT * FROM student WHERE " + searchMethod + " = '" + valueToSearch + "'";
+        System.out.println(query);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     System.out.printf("ID: %d, First Name: %s, Last Name: %s, Age: %d, Grade: %s%n",
@@ -117,6 +115,10 @@ public class Db {
         this.sortMethod = sortMethod;
     }
 
+    public void setSearchMethod(String searchMethod) {
+        this.searchMethod = searchMethod;
+    }
+
     public void updateAverageGrade() throws SQLException {
         String updateQuery = "UPDATE student SET average_grade = (SELECT AVG(CAST(grade AS DECIMAL(3,2))) FROM student)";
         try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
@@ -124,7 +126,7 @@ public class Db {
         }
     }
 
-    public void advancedSearchByMoyeneeDeNotes(int interval) throws SQLException {
+    public void searchByAverageGrade(int interval) throws SQLException {
         String query;
         switch (interval) {
             case 1:
