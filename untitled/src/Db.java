@@ -41,8 +41,6 @@ public class Db {
             statement.setInt(3, age);
             statement.setString(4, grade);
             statement.executeUpdate();
-
-            updateAverageGrade();
         }
     }
 
@@ -56,8 +54,6 @@ public class Db {
             statement.setString(4, grade);
             statement.setInt(5, id);
             statement.executeUpdate();
-
-            updateAverageGrade();
         }
     }
 
@@ -128,40 +124,21 @@ public class Db {
         this.searchMethod = searchMethod;
     }
 
-    // Method to update the average grade of students
-    public void updateAverageGrade() throws SQLException {
-        String avgGradeQuery = "SELECT AVG(CAST(grade AS DECIMAL(3,2))) AS avg_grade FROM student";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(avgGradeQuery)) {
-            if (rs.next()) {
-                double avgGrade = rs.getDouble("avg_grade");
-                String updateQuery = "UPDATE student SET average_grade = ?";
-                try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
-                    updateStmt.setDouble(1, avgGrade);
-                    updateStmt.executeUpdate();
-                }
-            }
-        }
-    }
-
     // Method to search students by average grade intervals
     public void searchByAverageGrade(int interval) throws SQLException {
         String query;
         switch (interval) {
             case 1:
-                query = "SELECT * FROM student WHERE average_grade >= 0 AND average_grade <= 20";
+                query = "SELECT * FROM student WHERE grade >= 0 AND grade <= 5";
                 break;
             case 2:
-                query = "SELECT * FROM student WHERE average_grade > 20 AND average_grade <= 40";
+                query = "SELECT * FROM student WHERE grade > 6 AND grade <= 10";
                 break;
             case 3:
-                query = "SELECT * FROM student WHERE average_grade > 40 AND average_grade <= 60";
+                query = "SELECT * FROM student WHERE grade > 11 AND grade <= 15";
                 break;
             case 4:
-                query = "SELECT * FROM student WHERE average_grade > 60 AND average_grade <= 80";
-                break;
-            case 5:
-                query = "SELECT * FROM student WHERE average_grade > 80 AND average_grade <= 100";
+                query = "SELECT * FROM student WHERE grade > 16 AND grade <= 20";
                 break;
             default:
                 throw new IllegalArgumentException("Interval not supported: " + interval);
@@ -169,11 +146,11 @@ public class Db {
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
-            System.out.println("Students in average grade interval " + interval + ":");
+            System.out.println("Students in grade interval " + interval + ":");
             while (rs.next()) {
-                System.out.printf("ID: %d, First Name: %s, Last Name: %s, Age: %d, Grade: %s, Average Grade: %.2f%n",
+                System.out.printf("ID: %d, First Name: %s, Last Name: %s, Age: %d, Grade: %s \n",
                         rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"),
-                        rs.getInt("age"), rs.getString("grade"), rs.getDouble("average_grade"));
+                        rs.getInt("age"), rs.getString("grade"));
             }
         }
     }
@@ -181,26 +158,23 @@ public class Db {
     // Method to calculate statistics by grade
     public void calculateStatisticsByGrade() throws SQLException {
         String query = "SELECT " +
-                "SUM(CASE WHEN average_grade BETWEEN 0 AND 20 THEN 1 ELSE 0 END) AS range_0_20, " +
-                "SUM(CASE WHEN average_grade BETWEEN 20 AND 40 THEN 1 ELSE 0 END) AS range_20_40, " +
-                "SUM(CASE WHEN average_grade BETWEEN 40 AND 60 THEN 1 ELSE 0 END) AS range_40_60, " +
-                "SUM(CASE WHEN average_grade BETWEEN 60 AND 80 THEN 1 ELSE 0 END) AS range_60_80, " +
-                "SUM(CASE WHEN average_grade BETWEEN 80 AND 100 THEN 1 ELSE 0 END) AS range_80_100 " +
+                "SUM(CASE WHEN grade BETWEEN 0 AND 5 THEN 1 ELSE 0 END) AS range_0_5, " +
+                "SUM(CASE WHEN grade BETWEEN 6 AND 10 THEN 1 ELSE 0 END) AS range_6_10, " +
+                "SUM(CASE WHEN grade BETWEEN 11 AND 15 THEN 1 ELSE 0 END) AS range_11_15, " +
+                "SUM(CASE WHEN grade BETWEEN 16 AND 20 THEN 1 ELSE 0 END) AS range_16_20 " +  // Removed the extra comma here
                 "FROM student";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
-                int totalStudents = rs.getInt("range_0_20") + rs.getInt("range_20_40") +
-                        rs.getInt("range_40_60") + rs.getInt("range_60_80") +
-                        rs.getInt("range_80_100");
+                int totalStudents = rs.getInt("range_0_5") + rs.getInt("range_6_10") +
+                        rs.getInt("range_11_15") + rs.getInt("range_16_20");
 
                 System.out.println("Statistics by Grade:");
-                System.out.printf("0-20: %.2f%%\n", (rs.getInt("range_0_20") * 100.0 / totalStudents));
-                System.out.printf("20-40: %.2f%%\n", (rs.getInt("range_20_40") * 100.0 / totalStudents));
-                System.out.printf("40-60: %.2f%%\n", (rs.getInt("range_40_60") * 100.0 / totalStudents));
-                System.out.printf("60-80: %.2f%%\n", (rs.getInt("range_60_80") * 100.0 / totalStudents));
-                System.out.printf("80-100: %.2f%%\n", (rs.getInt("range_80_100") * 100.0 / totalStudents));
+                System.out.printf("00-5: %.2f%%\n", (rs.getInt("range_0_5") * 100.0 / totalStudents));
+                System.out.printf("06-10: %.2f%%\n", (rs.getInt("range_6_10") * 100.0 / totalStudents));
+                System.out.printf("11-15: %.2f%%\n", (rs.getInt("range_11_15") * 100.0 / totalStudents));
+                System.out.printf("16-20: %.2f%%\n", (rs.getInt("range_16_20") * 100.0 / totalStudents));
             }
         }
     }
@@ -233,12 +207,12 @@ public class Db {
              ResultSet rs = stmt.executeQuery(query);
              FileWriter writer = new FileWriter(filePath)) {
 
-            writer.append("ID,First Name,Last Name,Age,Grade,Average Grade\n");
+            writer.append("ID,First Name,Last Name,Age,Grade\n");
 
             while (rs.next()) {
-                writer.append(String.format("%d,%s,%s,%d,%s,%.2f\n",
+                writer.append(String.format("%d,%s,%s,%d,%s\n",
                         rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"),
-                        rs.getInt("age"), rs.getString("grade"), rs.getDouble("average_grade")));
+                        rs.getInt("age"), rs.getString("grade")));
             }
 
             System.out.println("Successfully exported data to " + filePath);

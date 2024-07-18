@@ -172,12 +172,11 @@ public class Main {
                         break;
                     case 7:
                         // Advanced search by average grades
-                        System.out.println("Advanced search by average grades:");
-                        System.out.println("1. 0-20");
-                        System.out.println("2. 20-40");
-                        System.out.println("3. 40-60");
-                        System.out.println("4. 60-80");
-                        System.out.println("5. 80-100");
+                        System.out.println("Display students from a certain interval :");
+                        System.out.println("1. 00-5");
+                        System.out.println("2. 06-10");
+                        System.out.println("3. 11-15");
+                        System.out.println("4. 16-20");
                         int interval = scanner.nextInt();
                         dbManager.searchByAverageGrade(interval);
                         break;
